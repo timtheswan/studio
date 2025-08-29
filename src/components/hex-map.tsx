@@ -134,7 +134,8 @@ export function HexMap({ enabledTiles, onTileClick, setHoveredTile }: HexMapProp
               className={cn(
                 "stroke-border stroke-[1.5px] transition-all duration-200 origin-center hover:stroke-accent",
                 isEnabled ? 'fill-primary' : 'fill-card',
-                {'cursor-pointer': !isPanning}
+                {'cursor-pointer': !isPanning},
+                key === '0,0' && !isEnabled && 'fill-muted'
               )}
               style={{ vectorEffect: 'non-scaling-stroke' }}
               onClick={() => onTileClick(key)}
