@@ -53,6 +53,12 @@ export function cubeToOffset(cube: CubeCoords): OffsetCoords {
     return { col, row };
 }
 
+export function offsetToCube(offset: OffsetCoords): CubeCoords {
+    const q = offset.col;
+    const r = offset.row - (offset.col - (offset.col & 1)) / 2;
+    return { q, r, s: -q - r };
+}
+
 export function getHexCornerPoints(center: Point): string {
     const points: string[] = [];
     for (let i = 0; i < 6; i++) {

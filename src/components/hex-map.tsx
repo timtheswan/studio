@@ -8,7 +8,9 @@ import {
   cubeToOffset,
   hexToPixel,
   getHexCornerPoints,
-  CubeCoords
+  CubeCoords,
+  OffsetCoords,
+  offsetToCube,
 } from '@/lib/hex-utils';
 import type { HoverData } from './hex-mapper';
 import { cn } from '@/lib/utils';
@@ -16,10 +18,49 @@ import { cn } from '@/lib/utils';
 interface HexMapProps {
   enabledTiles: Set<string>;
   onTileClick: (key: string) => void;
+  hoveredTile: HoverData;
   setHoveredTile: (data: HoverData) => void;
 }
 
-export function HexMap({ enabledTiles, onTileClick, setHoveredTile }: HexMapProps) {
+function HexPolygon({ 
+  hex, 
+  isEnabled, 
+  isPanning,
+  isHovered,
+  onTileClick, 
+  handleTileHover 
+}: {
+  hex: CubeCoords,
+  isEnabled: boolean,
+  isPanning: boolean,
+  isHovered: boolean,
+  onTileClick: (key: string) => void,
+  handleTileHover: (e: React.MouseEvent, key: string) => void
+}) {
+  const offsetCoords = cubeToOffset(hex);
+  const key = `${offsetCoords.col},${offsetCoords.row}`;
+  const center = hexToPixel(hex);
+  const points = getHexCornerPoints(center);
+
+  return (
+    <polygon 
+      points={points}
+      className={cn(
+        "stroke-border stroke-[1.5px] transition-all duration-200 origin-center",
+        "drop-shadow-sm hover:drop-shadow-lg",
+        isEnabled ? 'fill-primary' : 'fill-card',
+        {'cursor-pointer': !isPanning},
+        key === '0,0' && !isEnabled && 'fill-muted',
+        isHovered ? "stroke-accent fill-accent/20" : "hover:stroke-accent hover:fill-accent/20"
+      )}
+      style={{ vectorEffect: 'non-scaling-stroke' }}
+      onClick={() => onTileClick(key)}
+      onMouseEnter={(e) => handleTileHover(e, key)}
+    />
+  );
+}
+
+export function HexMap({ enabledTiles, onTileClick, hoveredTile, setHoveredTile }: HexMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [view, setView] = useState({ scale: 1, x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -108,6 +149,12 @@ export function HexMap({ enabledTiles, onTileClick, setHoveredTile }: HexMapProp
     }
     return hexes;
   }, [view, dimensions]);
+  
+  const hoveredCube = useMemo(() => {
+    if (!hoveredTile) return null;
+    const [col, row] = hoveredTile.coords.split(',').map(Number);
+    return offsetToCube({ col, row });
+  }, [hoveredTile]);
 
   return (
     <svg 
@@ -123,26 +170,32 @@ export function HexMap({ enabledTiles, onTileClick, setHoveredTile }: HexMapProp
         {visibleHexes.map(hex => {
           const offsetCoords = cubeToOffset(hex);
           const key = `${offsetCoords.col},${offsetCoords.row}`;
-          const isEnabled = enabledTiles.has(key);
-          const center = hexToPixel(hex);
-          const points = getHexCornerPoints(center);
+          if (hoveredTile?.coords === key) return null; // Will be rendered separately
           
           return (
-            <polygon 
+            <HexPolygon
               key={key}
-              points={points}
-              className={cn(
-                "stroke-border stroke-[1.5px] transition-all duration-200 origin-center relative hover:z-10 hover:stroke-accent hover:fill-accent/20",
-                isEnabled ? 'fill-primary' : 'fill-card',
-                {'cursor-pointer': !isPanning},
-                key === '0,0' && !isEnabled && 'fill-muted'
-              )}
-              style={{ vectorEffect: 'non-scaling-stroke' }}
-              onClick={() => onTileClick(key)}
-              onMouseEnter={(e) => handleTileHover(e, key)}
+              hex={hex}
+              isEnabled={enabledTiles.has(key)}
+              isPanning={isPanning}
+              isHovered={false}
+              onTileClick={onTileClick}
+              handleTileHover={handleTileHover}
             />
           );
         })}
+        {/* Render hovered tile last to ensure it's on top */}
+        {hoveredCube && (
+           <HexPolygon
+              key={`${cubeToOffset(hoveredCube).col},${cubeToOffset(hoveredCube).row}-hovered`}
+              hex={hoveredCube}
+              isEnabled={enabledTiles.has(hoveredTile!.coords)}
+              isPanning={isPanning}
+              isHovered={true}
+              onTileClick={onTileClick}
+              handleTileHover={handleTileHover}
+            />
+        )}
       </g>
     </svg>
   );

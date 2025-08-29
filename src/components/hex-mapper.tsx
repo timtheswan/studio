@@ -65,6 +65,7 @@ export function HexMapper() {
       <HexMap
         enabledTiles={enabledTiles}
         onTileClick={handleTileClick}
+        hoveredTile={hoveredTile}
         setHoveredTile={setHoveredTile}
       />
       
@@ -85,9 +86,9 @@ export function HexMapper() {
       </div>
        <div className="absolute bottom-4 left-4 p-3 bg-card/80 rounded-lg shadow-lg backdrop-blur-sm text-sm text-card-foreground">
         <h3 className="font-bold mb-2">Controls</h3>
-        <p><kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Click</kbd> to toggle a tile</p>
-        <p className="mt-1"><kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Scroll</kbd> to zoom</p>
-        <p className="mt-1"><kbd className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Click & Drag</kbd> to pan</p>
+        <p><kbd className="px-2 py-1.5 my-2 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Click</kbd> to toggle a tile</p>
+        <p className="mt-1"><kbd className="px-2 my-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Scroll</kbd> to zoom</p>
+        <p className="mt-1"><kbd className="px-2 my-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Click & Drag</kbd> to pan</p>
       </div>
     </div>
   );
