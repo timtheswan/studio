@@ -132,7 +132,7 @@ export function HexMap({ enabledTiles, onTileClick, setHoveredTile }: HexMapProp
               key={key}
               points={points}
               className={cn(
-                "stroke-border stroke-[1.5px] transition-all duration-200 origin-center hover:stroke-accent",
+                "stroke-border stroke-[1.5px] transition-all duration-200 origin-center relative hover:z-10 hover:stroke-accent hover:fill-accent/20",
                 isEnabled ? 'fill-primary' : 'fill-card',
                 {'cursor-pointer': !isPanning},
                 key === '0,0' && !isEnabled && 'fill-muted'
