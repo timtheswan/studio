@@ -122,10 +122,6 @@ export function HexMap({ enabledTiles, onTileClick, setHoveredTile }: HexMapProp
       <g transform={`translate(${view.x}, ${view.y}) scale(${view.scale})`}>
         {visibleHexes.map(hex => {
           const offsetCoords = cubeToOffset(hex);
-          if ((offsetCoords.col + offsetCoords.row) % 2 !== 0) {
-             return null;
-          }
-
           const key = `${offsetCoords.col},${offsetCoords.row}`;
           const isEnabled = enabledTiles.has(key);
           const center = hexToPixel(hex);
